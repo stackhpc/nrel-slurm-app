@@ -197,6 +197,15 @@ resource "openstack_compute_instance_v2" "computes" {
   network {
     port = openstack_networking_port_v2.compute_storage[each.key].id
   }
+  
+  provisioner "file" {
+    content = templatefile("${path.module}/clouds.tpl",
+                            {
+                              "os_config": data.external.os_config.result
+                              "app_cred": openstack_identity_application_credential_v3.compute_cred
+                            },
+                          )
+    destination = "clouds.yaml" # in centos home
 
 }
 
@@ -222,6 +231,18 @@ resource "openstack_networking_router_interface_v2" "cluster" {
 //   floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
 //   instance_id = openstack_compute_instance_v2.logins[each.key].id
 // }
+
+resource "openstack_identity_application_credential_v3" "compute_cred" {
+
+  name = "${local.config.cluster.name}_${local.config.cluster.compute.name}"
+  description = "call openstack server rebuild from compute nodes"
+  # access_rules { # requires Train or above, didn't work anyway
+  #     path = "/v3/servers/{server_id}/action"
+  #     method = "POST"
+  #     service  = "compute"
+  # TODO: consider adding expires_at
+  #}
+}
 
 # TODO: needs fixing for case where creation partially fails resulting in "compute.network is empty list of object"
 resource "local_file" "hosts" {
