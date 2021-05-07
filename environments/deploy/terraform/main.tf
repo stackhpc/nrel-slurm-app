@@ -241,6 +241,12 @@ resource "openstack_compute_instance_v2" "computes" {
     access_network = true
   }
 
+  block_device {
+    source_type = "blank"
+    destination_type = "local"
+    volume_size = var.compute_scratch_size
+  }
+
 }
 
 # --- floating ips ---

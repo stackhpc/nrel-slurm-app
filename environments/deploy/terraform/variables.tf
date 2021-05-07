@@ -130,3 +130,8 @@ variable "external_network" {
   type = string
   description = "Name of pre-existing external network"
 }
+
+variable "compute_scratch_size" {
+  type = string
+  description = "Size in gigabytes of local scratch disk for compute nodes"
+}

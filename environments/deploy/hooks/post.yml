@@ -1,3 +1,15 @@
 ---
 
-
+- hosts: compute
+  become: yes
+  tasks:
+    - name: Make scratch filesystem on SSD
+      community.general.filesystem:
+        dev: "{{ compute_scratch_dev }}"
+        fstype: "{{ compute_scratch_fstype }}"
+    - name: Mount scratch
+      ansible.posix.mount:
+        path: "{{ compute_scratch_path }}"
+        src: "{{ compute_scratch_path }}"
+        state: mounted
+        fstype: "{{ compute_scratch_fstype }}"
