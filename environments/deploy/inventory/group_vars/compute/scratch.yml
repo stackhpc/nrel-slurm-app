@@ -1,3 +1,4 @@
 compute_scratch_dev: /dev/vdb
 compute_scratch_fstype: ext4
 compute_scratch_path: /scratch
+compute_scratch_state: mounted

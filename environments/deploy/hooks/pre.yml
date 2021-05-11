@@ -30,5 +30,5 @@
       ansible.posix.mount:
         path: "{{ compute_scratch_path }}"
         src: "{{ compute_scratch_path }}"
-        state: mounted
+        state: "{{ compute_scratch_state }}"
         fstype: "{{ compute_scratch_fstype }}"
