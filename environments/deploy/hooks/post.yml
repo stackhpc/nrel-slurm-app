@@ -1,0 +1,4 @@
+---
+# host_group == login
+# - hosts: login#
+
