@@ -10,10 +10,8 @@ compute_types = {
 }
 
 compute_names = {
-    sm-001: "small"
-    sm-002: "small"
-    ty-001: "tiny"
-    ty-002: "tiny"
+    "sm-{001..002}": "small"
+    "ty-{001..004}": "tiny"
 }
 
 compute_images = { # allows overrides for specific nodes, by name

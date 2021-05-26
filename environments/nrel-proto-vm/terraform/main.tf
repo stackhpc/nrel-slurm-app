@@ -207,7 +207,7 @@ resource "openstack_compute_instance_v2" "logins" {
 
 resource "openstack_networking_port_v2" "compute_cluster" {
 
-  for_each = var.compute_names
+  for_each = data.external.compute_names.result
 
   name = each.key
   network_id = data.openstack_networking_network_v2.cluster.id
@@ -232,7 +232,7 @@ resource "openstack_networking_port_v2" "compute_cluster" {
 
 resource "openstack_networking_port_v2" "compute_storage" {
 
-  for_each = var.compute_names
+  for_each = data.external.compute_names.result
 
   name = each.key
   network_id = data.openstack_networking_network_v2.storage.id
@@ -257,7 +257,7 @@ resource "openstack_networking_port_v2" "compute_storage" {
 
 resource "openstack_networking_port_v2" "compute_control" {
 
-  for_each = var.compute_names
+  for_each = data.external.compute_names.result
 
   name = each.key
   network_id = data.openstack_networking_network_v2.control.id
@@ -283,7 +283,7 @@ resource "openstack_networking_port_v2" "compute_control" {
 
 resource "openstack_compute_instance_v2" "computes" {
 
-  for_each = var.compute_names
+  for_each = data.external.compute_names.result
 
   name = "${var.cluster_name}-${each.key}"
   image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
@@ -308,21 +308,21 @@ resource "openstack_compute_instance_v2" "computes" {
 
 # --- floating ips ---
 
-resource "openstack_networking_floatingip_v2" "logins" {
+// resource "openstack_networking_floatingip_v2" "logins" {
 
-  for_each = var.login_names
+//   for_each = var.login_names
 
-  pool = data.openstack_networking_network_v2.external.name
-}
+//   pool = data.openstack_networking_network_v2.external.name
+// }
 
-resource "openstack_compute_floatingip_associate_v2" "logins" {
-  for_each = var.login_names
+// resource "openstack_compute_floatingip_associate_v2" "logins" {
+//   for_each = var.login_names
 
-  floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
-  instance_id = openstack_compute_instance_v2.logins[each.key].id
-   # networks are zero-indexed
-  fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
-}
+//   floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
+//   instance_id = openstack_compute_instance_v2.logins[each.key].id
+//    # networks are zero-indexed
+//   fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
+// }
 
 # --- template ---
 
@@ -331,7 +331,7 @@ resource "local_file" "hosts" {
   content  = templatefile("${path.module}/inventory.tpl",
                           {
                             "cluster_name": var.cluster_name
-                            "proxy_fip": openstack_networking_floatingip_v2.logins[var.proxy_name].address
+                            // "proxy_fip": openstack_networking_floatingip_v2.logins[var.proxy_name].address
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,
