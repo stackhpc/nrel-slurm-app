@@ -30,6 +30,21 @@ ${cluster_name}-vt-sm-002
 
 [${cluster_name}_gpu]
 ${cluster_name}-vt-gpu-001
+${cluster_name}-vt-gpu-002
+${cluster_name}-vt-gpu-003
+${cluster_name}-vt-gpu-004
+${cluster_name}-vt-gpu-005
+${cluster_name}-vt-gpu-006
+${cluster_name}-vt-gpu-007
+${cluster_name}-vt-gpu-008
+${cluster_name}-vt-gpu-009
+${cluster_name}-vt-gpu-010
+${cluster_name}-vt-gpu-011
+${cluster_name}-vt-gpu-012
+${cluster_name}-vt-gpu-013
+${cluster_name}-vt-gpu-014
+${cluster_name}-vt-gpu-015
+
 
 
 # vt-lg-001: "large"
