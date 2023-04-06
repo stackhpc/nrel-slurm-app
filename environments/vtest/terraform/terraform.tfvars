@@ -28,7 +28,22 @@ vt-lg-002: "large"
 vt-sm-001: "small"
 vt-sm-002: "small"
 vt-gpu-001: "gpu"
+vt-gpu-002: "gpu"
+vt-gpu-003: "gpu"
+vt-gpu-004: "gpu"
+vt-gpu-005: "gpu"
+vt-gpu-006: "gpu"
+vt-gpu-007: "gpu"
+vt-gpu-008: "gpu"
+vt-gpu-009: "gpu"
+vt-gpu-010: "gpu"
+vt-gpu-011: "gpu"
+vt-gpu-012: "gpu"
+vt-gpu-013: "gpu"
+vt-gpu-014: "gpu"
+vt-gpu-015: "gpu"
 }
+
 ###################################################
 
 #---- login node info ----
