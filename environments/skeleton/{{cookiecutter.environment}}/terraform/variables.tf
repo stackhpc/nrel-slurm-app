@@ -49,6 +49,36 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
+variable "state_volume_device_path" {
+    type = string
+    description = "Path to block device for state"
+    default = "/dev/sdb"
+}
+
+variable "home_volume_device_path" {
+    type = string
+    description = "Path to block device name for home directories"
+    default = "/dev/sdc"
+}
+
+variable "state_dir" {
+    type = string
+    description = "Path to state directory on control node"
+    default = "/var/lib/state"
+}
+
+variable "state_volume_size" {
+    type = number
+    description = "Size of state volume on control node, in GB"
+    default = 150 # GB
+}
+
+variable "home_volume_size" {
+    type = number
+    description = "Size of state volume on control node, in GB"
+    default = 100 # GB
+}
+
 variable "vnic_type" {
     type = string
     description = "VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
@@ -77,4 +107,10 @@ variable "nonlogin_security_groups" {
     default = [
         "default",  # allow all in-cluster services
     ]
+}
+
+variable "create_nodes" {
+    description = "Whether to create nodes (servers) or just ports and other infra"
+    type = bool # can't use bool as want to pass from command-line
+    default = true
 }
