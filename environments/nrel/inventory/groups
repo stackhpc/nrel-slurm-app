@@ -20,7 +20,7 @@ control
 [node_exporter:children]
 cluster
 
-[opendistro:children]
+[opensearch:children]
 control
 
 [slurm_stats:children]
@@ -29,6 +29,13 @@ control
 [filebeat:children]
 slurm_stats
 
+[update:children]
+cluster
+
+[fail2ban:children]
+# Hosts to install fail2ban on to protect SSH
+login
+
 [spack:children]
 login
 
@@ -36,15 +43,13 @@ login
 control
 compute
 
-[update:children]
-cluster
-
 [os_manila:children]
 openhpc
 
-[fail2ban:children]
-# Hosts to install fail2ban on to protect SSH
-login
+[etc_hosts]
+# Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+
+#################################################################
 
 [firewalld:children]
 # Hosts to install firewalld on
