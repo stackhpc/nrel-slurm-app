@@ -23,25 +23,25 @@ compute_types = {
 #######################################
 compute_names = {
 # Node-inventory.txt
-vt-lg-001: "large"
-vt-lg-002: "large"
-vt-sm-001: "small"
-vt-sm-002: "small"
-vt-gpu-001: "gpu"
-vt-gpu-002: "gpu"
-vt-gpu-003: "gpu"
-vt-gpu-004: "gpu"
-vt-gpu-005: "gpu"
-vt-gpu-006: "gpu"
-vt-gpu-007: "gpu"
-vt-gpu-008: "gpu"
-vt-gpu-009: "gpu"
-vt-gpu-010: "gpu"
-vt-gpu-011: "gpu"
-vt-gpu-012: "gpu"
-vt-gpu-013: "gpu"
-vt-gpu-014: "gpu"
-vt-gpu-015: "gpu"
+vtest-lg-001: "large"
+vtest-lg-002: "large"
+vtest-sm-001: "small"
+vtest-sm-002: "small"
+vtest-gpu-001: "gpu"
+vtest-gpu-002: "gpu"
+vtest-gpu-003: "gpu"
+vtest-gpu-004: "gpu"
+vtest-gpu-005: "gpu"
+vtest-gpu-006: "gpu"
+vtest-gpu-007: "gpu"
+vtest-gpu-008: "gpu"
+vtest-gpu-009: "gpu"
+vtest-gpu-010: "gpu"
+vtest-gpu-011: "gpu"
+vtest-gpu-012: "gpu"
+vtest-gpu-013: "gpu"
+vtest-gpu-014: "gpu"
+vtest-gpu-015: "gpu"
 }
 
 ###################################################
@@ -49,20 +49,20 @@ vt-gpu-015: "gpu"
 #---- login node info ----
 # name: flavor
 login_names = {
-  vt-login-1: "test.gen.c8m16s16"
-  vt-admin: "test.gen.c8m16s16"
+  vtest-login-1: "test.gen.c8m16s16"
+  vtest-admin: "test.gen.c8m16s16"
 }
 # name: IPaddr
 login_ips = {
-  vt-login-1: "10.60.107.241"
-  vt-admin: "10.60.107.243"
+  vtest-login-1: "10.60.107.241"
+  vtest-admin: "10.60.107.243"
 }
 login_image = "vs_rocky86_20221231"
 login_flavor = "test_admin_c8m16s16"
 # login_flavor = "test.gen.c8m16s16"
 #---- /login ----
 
-proxy_name = "vt-login-1"
+proxy_name = "vtest-admin"
 
 #---- CONTROL node info ----
 control_image = "vs_rocky86_20221231"
