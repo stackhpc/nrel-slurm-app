@@ -2,10 +2,13 @@
 
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
-grafana_version: 8.5.1
+grafana_version: '9.0.3'
 
 # need to copy some role defaults here so we can use in inventory:
 grafana_port: 3000
+
+# Define where state is stored
+grafana_data_dir: "{{ appliances_state_dir | default('/var/lib') }}/grafana"
 
 # Configure internal address & URL - note "api" means "internal" to cloudalchemy.grafana but "external" to appliance:
 grafana_api_address: "{{ hostvars[groups['grafana'].0].internal_address }}"
@@ -56,18 +59,27 @@ grafana_security:
 
 grafana_datasources:
   - name: prometheus
-    ds_type: prometheus
-    ds_url: "http://{{ prometheus_address }}:9090" # default prometheus port
+    type: prometheus
+    url: "http://{{ prometheus_address }}:9090" # default prometheus port
+    editable: true
   - name: slurmstats
-    ds_type: elasticsearch
-    ds_url: "https://{{ elasticsearch_address }}:9200"
-    basic_auth_user: admin
-    basic_auth_password: "{{ vault_elasticsearch_admin_password }}"
-    with_credentials: true
-    tls_skip_verify: true
-    time_field: "@timestamp"
-    database: "filebeat-*"
-    es_version: 70
+    type: grafana-opensearch-datasource
+    url: "https://{{ opensearch_address }}:9200"
+    basicAuth: true
+    basicAuthUser: admin
+    secureJsonData:
+      basicAuthPassword: "{{ vault_elasticsearch_admin_password }}"
+    withCredentials: true
+    jsonData:
+      tlsSkipVerify: true
+      database: filebeat-*
+      timeField: "@timestamp"
+    flavor: opensearch
+    editable: true
+    # readOnly: false
+
+grafana_plugins:
+  - grafana-opensearch-datasource
 
 # want to set grafana_server.serve_from_sub_path if have Open Ondemand to proxy:
 grafana_server:
