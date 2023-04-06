@@ -1,3 +1,0 @@
----
-- name: "Include {{ os_manila_mount_action }} tasks"
-  include_tasks: "{{ os_manila_mount_action }}.yml"
