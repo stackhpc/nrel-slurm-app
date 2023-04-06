@@ -1,11 +1,3 @@
-# - name: " "
-#   hosts: control,login,compute
-#   tags: nrel_
-#   become: true
-#   tasks:
-#     - include_role:
-#         name:
-
 # - name: "Set releasever and local repos"
 #   hosts: all
 #   tags: nrel_releasever
@@ -14,15 +6,15 @@
 #     - include_role:
 #         name: releasever-config
 
-- name: "fix possibly bad repo pointers"
-  hosts: all
-  tags:
-    - vs_pre
-    - nrel_repofix
-  become: true
-  tasks:
-    - shell:
-        cmd: for FF in `ls /etc/yum.repos.d/Rocky*`; do sed -i 's#gov/rocky/#gov/rocky-vault/#g' $FF; done
+# - name: "fix possibly bad repo pointers"
+#   hosts: all
+#   tags:
+#     - vs_pre
+#     - nrel_repofix
+#   become: true
+#   tasks:
+#     - shell:
+#         cmd: for FF in `ls /etc/yum.repos.d/Rocky*`; do sed -i 's#gov/rocky/#gov/rocky-vault/#g' $FF; done
 
 - name: NREL pre - Ensure times are correct
   hosts: all
@@ -32,10 +24,11 @@
   become: true
   vars:
     ntp_servers:
+      - "server time.hpc.nrel.gov iburst"
       - "server ds1.hpc.nrel.gov iburst"
       - "server ds2.hpc.nrel.gov iburst"
-      - "server ds3.hpc.nrel.gov iburst"
-      - "server ds4.nrel.gov iburst"
+      - "server time.nrel.gov iburst"
+      - "server time2.nrel.gov iburst"
   tasks:
     - name: Set timezone to Americas/Denver
       timezone:
@@ -86,16 +79,16 @@
       - nano
       # policycoreutils-python-utils setools-console setroubleshoot
   tasks:
-    - name: rm problem packages
-      dnf:
-        name: "{{rm_packages}}"
-        state: absent
-        allowerasing: true
     - name: Add useful packages
       dnf:
         name: "{{packages}}"
         state: present
-        nobest: true
+#        nobest: true
+    # - name: rm problem packages
+    #   dnf:
+    #     name: "{{rm_packages}}"
+    #     state: absent
+    #     allowerasing: true
 
 # - name: "NREL PRE - dnf packages"
 #   hosts: all
@@ -171,22 +164,22 @@
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
 
-# ref: Error: cannot setup namespace using "/usr/bin/newuidmap": should have setuid or have filecaps setuid:
-- name: "podman uid-gid workaround"
-  hosts:
-    - cluster
-  become: true
-  tags:
-    - vs_pre
-    - uid_gid_hack
-  tasks:
-    - name: "set newuidmap/newgidmap perms so containers will start"
-      file:
-        path: "{{ item }}"
-        mode: '4755'
-      loop:
-        - /usr/bin/newgidmap
-        - /usr/bin/newuidmap
+# # ref: Error: cannot setup namespace using "/usr/bin/newuidmap": should have setuid or have filecaps setuid:
+# - name: "podman uid-gid workaround"
+#   hosts:
+#     - cluster
+#   become: true
+#   tags:
+#     - vs_pre
+#     - uid_gid_hack
+#   tasks:
+#     - name: "set newuidmap/newgidmap perms so containers will start"
+#       file:
+#         path: "{{ item }}"
+#         mode: '4755'
+#       loop:
+#         - /usr/bin/newgidmap
+#         - /usr/bin/newuidmap
 
 - name: "NREL pre - install ldap requirements to nodes"
   hosts: compute
@@ -209,6 +202,23 @@
         name: aco_ceph_mount
       tags:
         - aco_ceph_mount
+
+# - name: "NREL pre - add ceph repos"
+#   hosts: all
+#   tags: do_nrel_ceph_repo
+#   become: true
+#   tasks:
+#     - name: "NREL pre - Add Ceph repo"
+#       yum_repository:
+#         name: ceph
+#         description: repo for ceph
+#         baseurl: "{{ os_manila_mount_ceph_repo_base }}"
+#         gpgcheck: 0
+#         gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
+#       when:
+#         - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
+#         - os_manila_mount_pkgs_install | default(true) | bool
+
 # #### This is a TOTAL hack or else podman container will not load
 # - name: fix perms on etc/subuid subgid files
 #   hosts: control
@@ -240,24 +250,6 @@
     #   loop:
     #     - /etc/subuid
     #     - /etc/subgid
-
-
-# - name: "NREL pre - add ceph repos"
-#   hosts: all
-#   tags: do_nrel_ceph_repo
-#   become: true
-#   tasks:
-#     - name: "NREL pre - Add Ceph repo"
-#       yum_repository:
-#         name: ceph
-#         description: repo for ceph
-#         baseurl: "{{ os_manila_mount_ceph_repo_base }}"
-#         gpgcheck: 0
-#         gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
-#       when:
-#         - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
-#         - os_manila_mount_pkgs_install | default(true) | bool
-
 
 #################################################################
 # vtest

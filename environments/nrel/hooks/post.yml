@@ -17,6 +17,21 @@
         state: present
         name: "{{ packages }}"
 
+- name: add kernel modules to compute and login nodes
+  hosts: login,compute
+  become: true
+  tags:
+    - post_powertools
+    - post_kernel_headers
+  tasks:
+    - yum:
+        enablerepo: powertools
+        state: present
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - kernel-devel
+
 - name: "Set/fix the the ephemeral ssd mounts"
   hosts: compute
   tags: set-ephemeral-mounts
@@ -53,39 +68,37 @@
     - include_role:
         name: vermilion_login_nodes
 
-- name: "admin util configs"
-  hosts: login,control
-  tags:
-    - vs_pre
-    - set_admin_configs
-  become: true
-  tasks:
-    - include_role:
-        name: vstack_admin_config
+# - name: "admin util configs"
+#   hosts: login,control
+#   tags:
+#     - vs_pre
+#     - set_admin_configs
+#   become: true
+#   tasks:
+#     - include_role:
+#         name: vstack_admin_config
 
+# - name: sync_slurm_allocations install on admin node
+#   hosts: admin
+#   become: true
+#   tags:
+#     - sync_slurm_allocations_admin
+#   vars:
+#     sync_slurm_allocations_clustername: "{{ cluster_slurm_name }}"
+#   tasks:
+#     - include_role:
+#         name: sync_slurm_allocations
 
-
-- name: sync_slurm_allocations install on admin node
-  hosts: admin
-  become: true
-  tags:
-    - sync_slurm_allocations_admin
-  vars:
-    sync_slurm_allocations_clustername: "{{ cluster_slurm_name }}"
-  tasks:
-    - include_role:
-        name: sync_slurm_allocations
-
-- name: cluster_dataset_manager create project directories
-  hosts: admin
-  become: true
-  tags:
-    - cluster_dataset_manager
-  vars:
-    cluster_dataset_manager_name: "{{ cluster_slurm_name }}"
-  tasks:
-    - include_role:
-        name: cluster_dataset_manager
+# - name: cluster_dataset_manager create project directories
+#   hosts: admin
+#   become: true
+#   tags:
+#     - cluster_dataset_manager
+#   vars:
+#     cluster_dataset_manager_name: "{{ cluster_slurm_name }}"
+#   tasks:
+#     - include_role:
+#         name: cluster_dataset_manager
 
 - name: pam_mkhomedir_plus
   hosts: login
@@ -96,41 +109,18 @@
     - include_role:
         name: pam_mkhomedir_plus
 
-- name: slurm_lex_accounting
-  hosts: control
-  become: true
-  tags:
-    - slurm_lex_accounting
-  tasks:
-    - include_role:
-        name: slurm_lex_accounting
-  vars:
-    slurm_lex_accounting_dev: False
-    slurm_lex_accounting_clustername: "{{ cluster_slurm_name }}"
+# - name: slurm_lex_accounting
+#   hosts: control
+#   become: true
+#   tags:
+#     - slurm_lex_accounting
+#   tasks:
+#     - include_role:
+#         name: slurm_lex_accounting
+#   vars:
+#     slurm_lex_accounting_dev: False
+#     slurm_lex_accounting_clustername: "{{ cluster_slurm_name }}"
 
-- name: vstack_admin_config
-  hosts: control,login
-  become: true
-  tags:
-    - vstack_admin_config
-  tasks:
-    - include_role:
-        name: vstack_admin_config
-
-- name: add kernel modules to compute and login nodes
-  hosts: login,compute
-  become: true
-  tags:
-    - post_powertools
-    - post_kernel_headers
-  tasks:
-    - yum:
-        enablerepo: powertools
-        state: present
-        name: "{{ packages }}"
-      vars:
-        packages:
-          - kernel-devel
 
 - name: IPA and LDAP san fix
   hosts: all
