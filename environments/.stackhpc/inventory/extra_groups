@@ -1,0 +1,9 @@
+[basic_users:children]
+cluster
+
+[rebuild:children]
+control
+compute
+
+[etc_hosts:children]
+cluster
