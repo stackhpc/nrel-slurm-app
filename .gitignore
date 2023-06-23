@@ -4,19 +4,7 @@ playbooks
 config-drive.iso
 venv
 *.pyc
-ansible-vault.pass
-._*
-*.DS_Store
-*.py[cod]
-
-# editor stuff
-###############################
-*.komodoproject
-*.wpr
-*.sublime-*
-.idea
-.idea/*
-*venv*
+packer/openhpc2
 .vscode
 *.code-*
 .cache
