@@ -21,29 +21,31 @@ ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.acc
 
 ## Define groups for slurm parititions:
 [${cluster_name}_lg]
-${cluster_name}-lg-001
-${cluster_name}-lg-002
+${cluster_name}-xlg-001
+${cluster_name}-xlg-002
 
 [${cluster_name}_sm]
-${cluster_name}-sm-001
-${cluster_name}-sm-002
+${cluster_name}-xsm-001
+${cluster_name}-xsm-002
+${cluster_name}-xsm-003
+${cluster_name}-xsm-004
 
 [${cluster_name}_gpu]
-${cluster_name}-gpu-001
-${cluster_name}-gpu-002
-${cluster_name}-gpu-003
-${cluster_name}-gpu-004
-${cluster_name}-gpu-005
-${cluster_name}-gpu-006
-${cluster_name}-gpu-007
-${cluster_name}-gpu-008
-${cluster_name}-gpu-009
-${cluster_name}-gpu-010
-${cluster_name}-gpu-011
-${cluster_name}-gpu-012
-${cluster_name}-gpu-013
-${cluster_name}-gpu-014
-${cluster_name}-gpu-015
+${cluster_name}-xgpu-001
+${cluster_name}-xgpu-002
+${cluster_name}-xgpu-003
+${cluster_name}-xgpu-004
+${cluster_name}-xgpu-005
+${cluster_name}-xgpu-006
+${cluster_name}-xgpu-007
+${cluster_name}-xgpu-008
+${cluster_name}-xgpu-009
+${cluster_name}-xgpu-010
+${cluster_name}-xgpu-011
+${cluster_name}-xgpu-012
+${cluster_name}-xgpu-013
+${cluster_name}-xgpu-014
+${cluster_name}-xgpu-015
 
 
 
