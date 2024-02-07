@@ -11,6 +11,7 @@ terraform {
 
 locals {
   cluster_name = regex("cluster_name  = \"([a-z]+)\"", file("${path.module}/../terraform.tfvars"))[0]
+  shares = toset(["home", "nopt", "scratch", "projects"])
 }
 
 resource "openstack_networking_network_v2" "storage" {
@@ -42,4 +43,25 @@ resource "openstack_blockstorage_volume_v3" "state" {
   name = "${local.cluster_name}-state"
   description = "State for control node"
   size = 10 # GB, doesn't matter for lab
+}
+
+resource "openstack_sharedfilesystem_share_v2" "manila" {
+
+  for_each = local.shares
+  
+  name = "${local.cluster_name}-${each.key}"
+  share_proto = "CEPHFS"
+  share_type = "ceph01_cephfs"
+  size = 1 # GB
+}
+
+
+resource "openstack_sharedfilesystem_share_access_v2" "manila" {
+
+  for_each = local.shares
+
+  share_id     = openstack_sharedfilesystem_share_v2.manila[each.key].id
+  access_type  = "cephx"
+  access_to    = "nrel"
+  access_level = "rw"
 }

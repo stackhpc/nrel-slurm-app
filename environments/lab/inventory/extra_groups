@@ -1,3 +1,7 @@
-# Don't have os_manila for lab so fake it using NFS
-[nfs:children]
+# Don't have working internal DNS
+[etc_hosts:children]
+cluster
+
+# TODO: update environments/{nrel,vtest}/inventory/groups
+[manila:children]
 openhpc

@@ -1,21 +1,25 @@
 os_manila_mount_share_user: nrel
-os_manila_mount_configurations:
-  nopt:
+os_manila_mount_shares:
+  - share_name: vslab-nopt # TODO: FIXME for prod,vtest
+    share_user: "{{ os_manila_mount_share_user }}"
     mount_path: /nopt
     mount_user: root
     mount_group: root
     mount_mode: '0775'
-  scratch: # share name
+  - share_name: vslab-scratch # TODO: FIXME for prod,vtest
+    share_user: "{{ os_manila_mount_share_user }}"
     mount_path: /scratch
     mount_user: root
     mount_group: root
     mount_mode: '0775'
-  home:
+  - share_name: vslab-home # TODO: FIXME for prod,vtest
+    share_user: "{{ os_manila_mount_share_user }}"
     mount_path: /home
     mount_user: root
     mount_group: root
     mount_mode: '0775'
-  projects:
+  - share_name: vslab-projects # TODO: FIXME for prod,vtest
+    share_user: "{{ os_manila_mount_share_user }}"
     mount_path: /projects
     mount_user: root
     mount_group: root
