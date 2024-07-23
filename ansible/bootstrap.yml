@@ -39,8 +39,22 @@
 
 - hosts: cluster
   gather_facts: false
+  become: yes
   tasks:
-    - name: Add groups
+    - name: Fix incorrect permissions on /etc in Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+      # breaks munge
+      file:
+        path: /etc
+        state: directory
+        owner: root
+        group: root
+        mode: u=rwx,go=rx # has g=rwx
+    - name: Prevent ssh hanging if shared home is unavailable
+      lineinfile:
+        path: /etc/profile
+        search_string: HOSTNAME=$(/usr/bin/hostnamectl --transient 2>/dev/null) || \
+        state: absent
+    - name: Add system user groups
       ansible.builtin.group: "{{ item.group }}"
       loop: "{{ appliances_local_users }}"
       when:
@@ -49,17 +63,16 @@
       become_method: "sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: '-i'
-      become: true
-    - name: Add users
+    - name: Add system users
       ansible.builtin.user: "{{ item.user }}"
       loop: "{{ appliances_local_users }}"
       when: item.enable | default(true) | bool
       become_method: "sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: '-i'
-      become: true
     - name: Reset ssh connection to allow user changes to affect ansible_user
       meta: reset_connection
+      become: no
 
 - hosts: systemd
   become: yes
@@ -82,6 +95,25 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
+# --- tasks after here require access to package repos ---
+- hosts: squid
+  tags: squid
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Configure squid proxy
+      import_role:
+        name: squid
+
+- hosts: tuned
+  tags: tuned
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Install and configure tuneD
+      import_role:
+        name: tuned
+
 - hosts: freeipa_server
   # Done here as it might be providing DNS
   tags:
@@ -95,7 +127,15 @@
         name: freeipa
         tasks_from: server.yml
 
-# --- tasks after here require access to package repos ---
+- hosts: cluster
+  gather_facts: false
+  become: yes
+  tags: cockpit
+  tasks:
+    - name: Remove RHEL cockpit
+      dnf:
+        name: cockpit-ws
+        state: "{{ appliances_cockpit_state }}"
 
 - hosts: firewalld
   gather_facts: false
@@ -187,3 +227,11 @@
     - name: update facts
       setup:
       when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
+
+- hosts: ofed
+  gather_facts: no
+  become: yes
+  tags: ofed
+  tasks:
+    - include_role:
+        name: ofed

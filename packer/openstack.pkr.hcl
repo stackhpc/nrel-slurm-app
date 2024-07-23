@@ -39,26 +39,29 @@ variable "networks" {
   type = list(string)
 }
 
-# Must supply either source_image_name or source_image
-variable "source_image_name" {
+variable "os_version" {
   type = string
-  default = null
+  description = "'RL8' or 'RL9' with default source_image_* mappings"
+  default = "RL9"
+}
+
+# Must supply either source_image_name or source_image_id
+variable "source_image_name" {
+  type = map(string)
+  description = "name of source image, keyed from var.os_version"
+  default = {
+    RL8: "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2"
+    RL9: "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
+  }
 }
 
 variable "source_image" {
-  type = string
-  default = null
-}
-
-# Must supply either fatimage_source_image_name or fatimage_source_image
-variable "fatimage_source_image_name" {
-  type = string
-  default = null
-}
-
-variable "fatimage_source_image" {
-  type = string
-  default = null
+  type = map(string)
+  default = {
+    RL8: null
+    RL9: null
+  }
+  description = "UUID of source image, keyed from var.os_version"
 }
 
 variable "flavor" {
@@ -120,6 +123,11 @@ variable "use_blockstorage_volume" {
   default = false
 }
 
+variable "volume_type" {
+  type = string
+  default = null
+}
+
 variable "volume_size" {
   type = number
   default = null # When not specified use the size of the builder instance root disk
@@ -135,64 +143,74 @@ variable "metadata" {
   default = {}
 }
 
+variable "groups" {
+  type = map(list(string))
+  description = "Additional inventory groups (other than 'builder') to add build VM to, keyed by source name"
+  default = {
+    # fat image builds:
+    openhpc = ["control", "compute", "login"]
+    openhpc-ofed = ["control", "compute", "login", "ofed"]
+  }
+}
+
 source "openstack" "openhpc" {
-  flavor = "${var.flavor}"
-  volume_size = "${var.volume_size}"
-  use_blockstorage_volume = "${var.use_blockstorage_volume}"
-  image_disk_format = "${var.image_disk_format}"
-  metadata = "${var.metadata}"
-  networks = "${var.networks}"
-  ssh_username = "${var.ssh_username}"
+  # Build VM:
+  flavor = var.flavor
+  use_blockstorage_volume = var.use_blockstorage_volume
+  volume_type = var.volume_type
+  metadata = var.metadata
+  networks = var.networks
+  floating_ip_network = var.floating_ip_network
+  security_groups = var.security_groups
+  volume_size = var.volume_size
+  
+  # Input image:
+  source_image = "${var.source_image[var.os_version]}"
+  source_image_name = "${var.source_image_name[var.os_version]}" # NB: must already exist in OpenStack
+  
+  # SSH:
+  ssh_username = var.ssh_username
   ssh_timeout = "20m"
-  ssh_private_key_file = "${var.ssh_private_key_file}" # TODO: doc same requirements as for qemu build?
-  ssh_keypair_name = "${var.ssh_keypair_name}" # TODO: doc this
-  ssh_bastion_host = "${var.ssh_bastion_host}"
-  ssh_bastion_username = "${var.ssh_bastion_username}"
-  ssh_bastion_private_key_file = "${var.ssh_bastion_private_key_file}"
-  security_groups = "${var.security_groups}"
-  image_visibility = "${var.image_visibility}"
+  ssh_private_key_file = var.ssh_private_key_file
+  ssh_keypair_name = var.ssh_keypair_name # TODO: doc this
+  ssh_bastion_host = var.ssh_bastion_host
+  ssh_bastion_username = var.ssh_bastion_username
+  ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
+  
+  # Output image:
+  image_disk_format = var.image_disk_format
+  image_visibility = var.image_visibility
+  image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
 }
 
-# NB: build names, split on "-", are used to determine groups to add build to, so could build for a compute gpu group using e.g. `compute-gpu`.
 build {
+
+  # non-OFED fat image:
   source "source.openstack.openhpc" {
-    name = "compute"
-    source_image = "${var.source_image}"
-    source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
-    image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # also provides a unique legal instance hostname (in case of parallel packer builds)
+    name = "openhpc"
   }
 
-  provisioner "ansible" {
-    playbook_file = "${var.repo_root}/ansible/site.yml"
-    groups = concat(["builder"], split("-", "${source.name}"))
-    keep_inventory_file = true # for debugging
-    use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/${source.name}_extravars.yml"]
-  }
-
-  post-processor "manifest" {
-    output = "${var.manifest_output_path}"
-    custom_data  = {
-      source = "${source.name}"
-    }
-  }
-}
-
-# The "fat" image build with all binaries:
-build {
+  # OFED fat image:
   source "source.openstack.openhpc" {
-    floating_ip_network = "${var.floating_ip_network}"
-    source_image = "${var.fatimage_source_image}"
-    source_image_name = "${var.fatimage_source_image_name}" # NB: must already exist in OpenStack
-    image_name = "${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # similar to name from slurm_image_builder
+    name = "openhpc-ofed"
+  }
+
+  # Extended site-specific image, built on fat image:
+  source "source.openstack.openhpc" {
+    name = "openhpc-extra"
   }
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
-    groups = ["builder", "control", "compute", "login"]
+    groups = concat(["builder"], var.groups[source.name])
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/${source.name}_extravars.yml"]
+    extra_arguments = [
+      "--limit", "builder", # prevent running against real nodes, if in inventory!
+      "-i", "${var.repo_root}/packer/ansible-inventory.sh",
+      "-vv",
+      "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
+      ]
   }
 
   post-processor "manifest" {
