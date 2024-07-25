@@ -26,6 +26,18 @@
         shell:
           cmd: dnf clean all
 
+  - hosts: openhpc
+    become: true
+    gather_facts: false
+    tasks:
+      - name: remove openhpc user slurm binaries
+        file:
+          path: "/usr/bin/{{ item }}"
+          state: absent
+        loop: [sacct, sacctmgr, salloc, sattach, sbatch, sbcast, scancel, scontrol,
+               scrontab, scrun, sdiag, sinfo, sprio, squeue, sreport, srun, sshare,
+               sstat, strigger]
+
 # - name: sync_slurm_allocations install on admin node
 #   hosts: admin
 #   become: true
