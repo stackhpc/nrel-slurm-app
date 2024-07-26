@@ -1,7 +1,9 @@
-flavor = "ec1.large" # 8GB RAM
+flavor = "ec1.large" # 8GB RAM, 4GB is too low
 image_disk_format = "qcow2" # on some clouds the default is raw
 use_blockstorage_volume = true # required to set image format, also decouples image size from build VM flavor disk size
-volume_size = 25 # GB - trial and error!
+
+volume_size = 25 # GB - trial and error
+volume_type = "unencrypted" # leafcloud specific (default volume is encrypted which can't be turned into a qcow image)
 
 source_image_name = {
     RL8 = null # we don't use this
