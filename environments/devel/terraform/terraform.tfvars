@@ -1,14 +1,14 @@
 compute_types = {
   tiny: {
-    flavor: "slurm_test_compute_t"
+    flavor: "test.compute.c4m16s8e60"
     image: "openhpc-ofed-RL9-240712-1425"
   }
   small: {
-    flavor: "slurm_test_compute_sm"
+    flavor: "test.compute.c8m32s8e60"
     image: "openhpc-ofed-RL9-240712-1425"
   }
   standard: {
-    flavor: "slurm_test_compute_std"
+    flavor: "test.compute.c30m120s60e5000"
     image: "openhpc-ofed-RL9-240712-1425"
   }
   gpu: {
@@ -38,19 +38,19 @@ compute_types = {
 login_image = "openhpc-ofed-RL9-240712-1425"
 login_flavor = "vermilion_util_c8m15"
 
-proxy_name = "vtlogin-1"
+proxy_name = "devadmin"
 
 # The `admin` node is like a login node, 
 # but access is limited for admin-type worlflows
 
 login_names = {
-  vtlogin-1: "vermilion_util_c8m15"
-  vtadmin: "vermilion_util_c8m15"
+  devlogin-1: "vermilion_util_c8m15"
+  devadmin: "vermilion_util_c8m15"
 }
 # name: IPaddr
 login_ips = {
-  vtlogin-1: "10.60.105.71"
-  vtadmin: "10.60.105.73"
+  devlogin-1: "10.60.105.71"
+  devadmin: "10.60.105.73"
 }
 
 #---- CONTROL node info ----
@@ -61,8 +61,8 @@ control_flavor = "vermilion_util_c8m15"
 
 ###################################################
 
-cluster_name  = "vtest"
-cluster_slurm_name = "vtest"
+cluster_name  = "devel"
+cluster_slurm_name = "devel"
 cluster_availability_zone = "esif"
 
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
