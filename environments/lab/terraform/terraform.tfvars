@@ -9,7 +9,7 @@ compute_types = {
   }
   small: {
     flavor: "en1.xsmall"
-    image: "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
+    image: "openhpc-ofed-RL9-240712-1425-6830f97b" # v1.150
   }
   tiny: {
     flavor: "compute.c4m16s8e60"
@@ -42,11 +42,11 @@ login_names = {
 login_ips = {} # Don't use FIPs for lab but need to define for symlinked variables.tf
 #
 
-login_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
+login_image = "openhpc-ofed-RL9-240712-1425-6830f97b" # v1.150
 login_flavor = "en1.xsmall"
 
 
-control_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
+control_image = "openhpc-ofed-RL9-240712-1425-6830f97b" # v1.150
 control_flavor = "ec1.medium"
 
 control_ip = "" # Don't use FIPs for lab but need to define for symlinked variables.tf

@@ -1,0 +1,2 @@
+cuda_distro: rhel9 # this is fixed in a non-released appliance version
+cuda_packages: [] # only want drivers not cuda

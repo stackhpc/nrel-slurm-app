@@ -1,6 +1,7 @@
 ---
 hpctests_rootdir:
 hpctests_extra_paths: []
+hpctests_pre_cmd: ''
 hpctests_pingmatrix_modules: [gnu12 openmpi4]
 hpctests_pingpong_modules: [gnu12 openmpi4 imb]
 hpctests_pingpong_command: 'mpirun IMB-MPI1 pingpong' # NB 'srun --mpi=pmi2 IMB-MPI1 pingpong'  doesn't work in ohpc v2.1
